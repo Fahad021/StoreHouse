@@ -224,22 +224,14 @@ def main(load_profile_input, solar_profile_input, customer_class_input, solar_sy
     # Assumed daily cycling over lifetime given in Lazard report, pg. 14.
     # 10 years for lithium-ion batteries , 20 years for flow batteries.
 
-    if Storage_Type_Input == "Lithium-Ion Battery":
-        Cycle_Life = 10 * 365.25
-    elif Storage_Type_Input == "Flow Battery":
+    if Storage_Type_Input == "Flow Battery":
         Cycle_Life = 20 * 365.25
 
-    # Storage Depth of Discharge
-    # Storage depth of discharge is the percentage of total battery capacity
-    # that is usable battery capacity. 80# for lithium-ion batteries, 100# for
-    # flow batteries. Used to calculate battery cost, whereas usable battery
-    # capacity is used as an input to operational simulation portion of model.
-
-    if Storage_Type_Input == "Lithium-Ion Battery":
-        Storage_Depth_of_Discharge = 0.8
-    elif Storage_Type_Input == "Flow Battery":
         Storage_Depth_of_Discharge = 1
 
+    elif Storage_Type_Input == "Lithium-Ion Battery":
+        Cycle_Life = 10 * 365.25
+        Storage_Depth_of_Discharge = 0.8
     # State of Charge at Beginning and End of Year
     # Initial and final state of charge of the battery at the beginning and end
     # of the year.

@@ -81,16 +81,15 @@ def register():
     from models import User
     if current_user.is_authenticated:
         return {"status": 400, "message": "Already logged in"}
-    else:
-        first_name = request.json['first_name']
-        last_name = request.json['last_name']
-        email = request.json['email']
-        password = request.json['password']
-        try:
-            new_user = User.create_user(first_name, last_name, email, password)
-        except:
-            raise InvalidUsage(["Account could not be created. Please try again."])
-        return new_user
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    email = request.json['email']
+    password = request.json['password']
+    try:
+        new_user = User.create_user(first_name, last_name, email, password)
+    except:
+        raise InvalidUsage(["Account could not be created. Please try again."])
+    return new_user
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -115,7 +114,7 @@ def logout():
 @login_required
 def get_or_delete_user(user_id=None):
     from models import User
-    if user_id == None and request.method == 'GET':
+    if user_id is None and request.method == 'GET':
         return User.get_users()
     elif request.method == 'GET':
         return User.get_user(user_id)
@@ -170,10 +169,7 @@ def create_property(step=None):
             ### UpdateGenability and the local db
             GenabilityInterface.set_utility(providerAccountId=provider_account_id, lseId=lseId)
             Property.set_utility(provider_account_id=provider_account_id, utility_id=lseId, utility_name=utility_name)
-            ### Retrieve and return tariffs associated with the account
-            tariffs = GenabilityInterface.get_tariffs(providerAccountId=provider_account_id)
-            return tariffs
-
+            return GenabilityInterface.get_tariffs(providerAccountId=provider_account_id)
         if step == "3":
             provider_account_id = request.json['provider_account_id']
             master_tariff_id = request.json['master_tariff_id']
@@ -240,9 +236,9 @@ def create_property(step=None):
             # Retrieve the solar 8760 data
             s_response = GenabilityInterface.get_solar_profile(edited_property.solar_profile_id)
             s_data = json.loads(s_response)
-            solar_profile = []
-            for hour in s_data["results"][0]["baselineMeasures"]:
-                solar_profile.append(hour["v"])
+            solar_profile = [
+                hour["v"] for hour in s_data["results"][0]["baselineMeasures"]
+            ]
             # Call the OSESMO to return the 8760 data for storage
             from services.osesmo import main
             if storage_system != '0':
@@ -270,18 +266,22 @@ def create_property(step=None):
             yearly_savings = float(data["results"][0]["summary"]["netAvoidedCost"])
             monthly_savings = yearly_savings / 12
             payback_period = (storage_installed_cost + solar_installed_cost) / yearly_savings
-            # Save the reuslts to the local db
-            finished_property = Property.set_savings_profile(provider_account_id, solar_installed_cost, storage_installed_cost, monthly_savings, payback_period)
-            return finished_property
+            return Property.set_savings_profile(
+                provider_account_id,
+                solar_installed_cost,
+                storage_installed_cost,
+                monthly_savings,
+                payback_period,
+            )
 
 @app.route('/property', methods=['GET'])
 @app.route('/property/<property_id>', methods=['GET', 'DELETE'])
 @login_required
 def get_property(property_id=None):
     from models import Property
-    if property_id == None:
+    if property_id is None:
         user_id = request.args.get('user_id')
-        if user_id == None:
+        if user_id is None:
             return Property.get_properties()
         return Property.get_user_properties(user_id)
     if request.method == 'DELETE':

@@ -57,7 +57,7 @@ class GenabilityApiInterface():
         ):
 
         account_uuid = str(uuid.uuid4())
-        endpoint_url = f"v1/accounts"
+        endpoint_url = "v1/accounts"
         customerClass = self.CustomerClasses[customer_class]
 
         api_body = {
@@ -120,9 +120,9 @@ class GenabilityApiInterface():
         if count == 1:
             return json.dumps(options, indent=4)
         elif count == 2:
-            return json.dumps(options[0:2], indent=4)
+            return json.dumps(options[:2], indent=4)
         elif count > 2:
-            return json.dumps(options[0:3], indent=4)
+            return json.dumps(options[:3], indent=4)
         else:
             return {"status": "400", "message": "Something went wrong, please try again."}
 
@@ -158,7 +158,7 @@ class GenabilityApiInterface():
 
     # Creates a custom electricity profile from their last three bill statements. Note bills are provided as the number kWh of electricity used (as a string)
     def create_electricity_profile(self, providerAccountId, bill_1: str, bill_2: str, bill_3: str):
-        endpoint_url = f'/v1/profiles'
+        endpoint_url = '/v1/profiles'
         api_body = { 
             "providerAccountId" : providerAccountId,
             "providerProfileId" : f'{providerAccountId}-bills',
@@ -191,7 +191,7 @@ class GenabilityApiInterface():
 
      # Creates a solar energy production profile given input data. Direction is either EAST, SOUTH, or WEST. Size is the kW capacity of the system, represented as a string.
     def create_solar_profile(self, providerAccountId, direction: str, system_size: str, tilt: str):
-        endpoint_url = f'/v1/profiles'
+        endpoint_url = '/v1/profiles'
         azimuthConversion = {
             "EAST": "90",
             "SOUTH": "180",
@@ -261,7 +261,7 @@ class GenabilityApiInterface():
 
     # Sets solar production profile based on 8760 read data
     def set_storage_profile(self, storage_profile, providerAccountId, storageProfileId):
-        endpoint_url = f'/v1/profiles'
+        endpoint_url = '/v1/profiles'
         api_body = { 
                 "providerAccountId" : providerAccountId,
                 "providerProfileId" : storageProfileId,
@@ -340,7 +340,7 @@ class GenabilityApiInterface():
 
     # Genability savings analysis on solar only system
     def analyze_solar(self, providerAccountId, masterTarrifId, electricityProfileId, solarProfileId):
-        endpoint_url = f'/v1/accounts/analysis'
+        endpoint_url = '/v1/accounts/analysis'
         api_body = {
             "providerAccountId" : providerAccountId,
             "fromDateTime" : "2019-01-01",
@@ -379,7 +379,7 @@ class GenabilityApiInterface():
 
     # Genability savings analysis on solar plus storage system
     def analyze_solar_plus_storage(self, providerAccountId, masterTarrifId, electricityProfileId, solarProfileId, storageProfileId):
-        endpoint_url = f'/v1/accounts/analysis'
+        endpoint_url = '/v1/accounts/analysis'
         # Tariffs analyzing the after situation should be time of use
         # residential = E-TOU-B
         # commercial = A-10-TOU
